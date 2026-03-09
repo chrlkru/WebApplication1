@@ -1,0 +1,249 @@
+@page "/__portfolio-admin-7f1d2"
+@model WebApplication1.Pages.Admin.ControlModel
+@using System
+@using System.Collections.Generic
+@{
+    ViewData["Title"] = "Portfolio Admin";
+    var selectedSet = new HashSet<string>(Model.SelectedRepositories, StringComparer.OrdinalIgnoreCase);
+}
+
+<section class="admin-shell">
+    <h1>Hidden Portfolio Admin</h1>
+
+    @if (!Model.IsAuthorized)
+    {
+        <p class="admin-note">Enter access code to open configuration.</p>
+        @if (!string.IsNullOrWhiteSpace(Model.LoginError))
+        {
+            <p class="admin-error">@Model.LoginError</p>
+        }
+
+        <form method="post" asp-page-handler="Login" class="admin-form">
+            <label asp-for="AccessCode">Access code</label>
+            <input asp-for="AccessCode" autocomplete="off" />
+            <button type="submit">Open panel</button>
+        </form>
+    }
+    else
+    {
+        @if (!string.IsNullOrWhiteSpace(Model.SaveStatus))
+        {
+            <p class="admin-note">@Model.SaveStatus</p>
+        }
+
+        <form method="post" asp-page-handler="Save" class="admin-form" enctype="multipart/form-data">
+            <div class="admin-group">
+                <label asp-for="GitHubUsername">GitHub username</label>
+                <input asp-for="GitHubUsername" />
+            </div>
+
+            <div class="admin-group">
+                <label asp-for="GitHubToken">GitHub token (optional)</label>
+                <input asp-for="GitHubToken" autocomplete="off" />
+                <small class="admin-help">
+                    Token is stored and kept in this field after save.
+                </small>
+            </div>
+
+            <div class="admin-group">
+                <label>Selected repositories (public, non-fork)</label>
+                <div class="repo-list">
+                    @if (Model.AvailableRepositories.Count == 0)
+                    {
+                        <p class="admin-note">No repositories loaded.</p>
+                    }
+                    else
+                    {
+                        @foreach (var repo in Model.AvailableRepositories)
+                        {
+                            <label class="repo-item">
+                                @if (selectedSet.Contains(repo.Name))
+                                {
+                                    <input type="checkbox"
+                                           name="SelectedRepositories"
+                                           value="@repo.Name"
+                                           checked />
+                                }
+                                else
+                                {
+                                    <input type="checkbox"
+                                           name="SelectedRepositories"
+                                           value="@repo.Name" />
+                                }
+                                <span>@repo.Name</span>
+                                <span class="repo-meta">stars: @repo.Stars</span>
+                            </label>
+                        }
+                    }
+                </div>
+            </div>
+
+            <div class="admin-group">
+                <label>Project subpages (optional, per selected repository)</label>
+                @if (Model.ProjectPages.Count == 0)
+                {
+                    <p class="admin-note">Select repositories first, then save to configure subpages.</p>
+                }
+                else
+                {
+                    <div class="project-pages-editor">
+                        @for (var i = 0; i < Model.ProjectPages.Count; i++)
+                        {
+                            <article class="project-page-card">
+                                <input type="hidden" asp-for="ProjectPages[i].RepositoryName" />
+
+                                <header class="project-page-header">
+                                    <h3>@Model.ProjectPages[i].RepositoryName</h3>
+                                    <label class="checkbox-inline">
+                                        <input asp-for="ProjectPages[i].EnableProjectPage" />
+                                        Enable subpage
+                                    </label>
+                                </header>
+
+                                <div class="admin-grid">
+                                    <div class="admin-group">
+                                        <label asp-for="ProjectPages[i].Slug">URL slug</label>
+                                        <input asp-for="ProjectPages[i].Slug" />
+                                    </div>
+                                    <div class="admin-group">
+                                        <label asp-for="ProjectPages[i].Title">Presentation title</label>
+                                        <input asp-for="ProjectPages[i].Title" />
+                                    </div>
+                                </div>
+
+                                <div class="admin-group">
+                                    <label asp-for="ProjectPages[i].Intro">Intro</label>
+                                    <textarea asp-for="ProjectPages[i].Intro" rows="2"></textarea>
+                                </div>
+
+                                <div class="admin-grid">
+                                    <div class="admin-group">
+                                        <label asp-for="ProjectPages[i].Problem">Problem</label>
+                                        <textarea asp-for="ProjectPages[i].Problem" rows="3"></textarea>
+                                    </div>
+                                    <div class="admin-group">
+                                        <label asp-for="ProjectPages[i].Solution">Solution</label>
+                                        <textarea asp-for="ProjectPages[i].Solution" rows="3"></textarea>
+                                    </div>
+                                </div>
+
+                                <div class="admin-group">
+                                    <label asp-for="ProjectPages[i].Result">Result</label>
+                                    <textarea asp-for="ProjectPages[i].Result" rows="3"></textarea>
+                                </div>
+
+                                <div class="admin-grid">
+                                    <div class="admin-group">
+                                        <label asp-for="ProjectPages[i].TechStack">Tech stack (comma separated)</label>
+                                        <input asp-for="ProjectPages[i].TechStack" />
+                                    </div>
+                                    <div class="admin-group">
+                                        <label asp-for="ProjectPages[i].HeroImageUrl">Hero image URL (optional)</label>
+                                        <input asp-for="ProjectPages[i].HeroImageUrl" />
+                                    </div>
+                                </div>
+
+                                <div class="admin-group">
+                                    <label>Carousel media (images/videos)</label>
+                                    @if (Model.ProjectPages[i].MediaItems.Count == 0)
+                                    {
+                                        <p class="admin-note">No media uploaded yet.</p>
+                                    }
+                                    else
+                                    {
+                                        <div class="media-admin-list">
+                                            @for (var j = 0; j < Model.ProjectPages[i].MediaItems.Count; j++)
+                                            {
+                                                <div class="media-admin-item">
+                                                    <input type="hidden" asp-for="ProjectPages[i].MediaItems[j].Url" />
+                                                    <input type="hidden" asp-for="ProjectPages[i].MediaItems[j].MediaType" />
+
+                                                    <div class="media-admin-preview">
+                                                        @if (Model.ProjectPages[i].MediaItems[j].MediaType == "video")
+                                                        {
+                                                            <video src="@Model.ProjectPages[i].MediaItems[j].Url" muted preload="metadata"></video>
+                                                        }
+                                                        else
+                                                        {
+                                                            <img src="@Model.ProjectPages[i].MediaItems[j].Url" alt="media preview" />
+                                                        }
+                                                    </div>
+
+                                                    <div class="admin-grid">
+                                                        <div class="admin-group">
+                                                            <label asp-for="ProjectPages[i].MediaItems[j].SortOrder">Order</label>
+                                                            <input asp-for="ProjectPages[i].MediaItems[j].SortOrder" />
+                                                        </div>
+                                                        <div class="admin-group">
+                                                            <label asp-for="ProjectPages[i].MediaItems[j].Caption">Caption</label>
+                                                            <input asp-for="ProjectPages[i].MediaItems[j].Caption" />
+                                                        </div>
+                                                    </div>
+
+                                                    <label class="checkbox-inline">
+                                                        <input asp-for="ProjectPages[i].MediaItems[j].Remove" />
+                                                        Remove
+                                                    </label>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+
+                                    <label class="upload-label" for="ProjectUpload_@i">Upload new files</label>
+                                    <input id="ProjectUpload_@i"
+                                           class="upload-input"
+                                           type="file"
+                                           name="ProjectUpload_@i"
+                                           multiple
+                                           accept="image/*,video/*" />
+                                </div>
+                            </article>
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="admin-group checkbox-row">
+                <input asp-for="ShowAboutSection" />
+                <label asp-for="ShowAboutSection">Show About section</label>
+            </div>
+
+            <div class="admin-group">
+                <label asp-for="AboutTitle">About title</label>
+                <input asp-for="AboutTitle" />
+            </div>
+
+            <div class="admin-group">
+                <label asp-for="AboutText">About text</label>
+                <textarea asp-for="AboutText" rows="4"></textarea>
+            </div>
+
+            <div class="admin-group checkbox-row">
+                <input asp-for="ShowContactsSection" />
+                <label asp-for="ShowContactsSection">Show Contacts section</label>
+            </div>
+
+            <div class="admin-group">
+                <label asp-for="ContactsEmail">Email</label>
+                <input asp-for="ContactsEmail" />
+            </div>
+
+            <div class="admin-group">
+                <label asp-for="ContactsTelegram">Telegram (@@handle or URL)</label>
+                <input asp-for="ContactsTelegram" />
+            </div>
+
+            <div class="admin-group">
+                <label asp-for="ContactsWebsite">Website (domain or URL)</label>
+                <input asp-for="ContactsWebsite" />
+            </div>
+
+            <div class="admin-group">
+                <label asp-for="AdminAccessCode">Admin access code</label>
+                <input asp-for="AdminAccessCode" autocomplete="off" />
+            </div>
+
+            <button type="submit">Save settings</button>
+        </form>
+    }
+</section>

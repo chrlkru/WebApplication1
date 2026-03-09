@@ -1,0 +1,126 @@
+@page
+@model IndexModel
+@using System
+@{
+    ViewData["Title"] = "GitHub Portfolio";
+    var telegramHandle = Model.Settings.ContactsTelegram.Trim();
+    var telegramLink = string.IsNullOrWhiteSpace(telegramHandle)
+        ? string.Empty
+        : telegramHandle.StartsWith("http", StringComparison.OrdinalIgnoreCase)
+            ? telegramHandle
+            : $"https://t.me/{telegramHandle.TrimStart('@')}";
+
+    var website = Model.Settings.ContactsWebsite.Trim();
+    var websiteLink = string.IsNullOrWhiteSpace(website)
+        ? string.Empty
+        : website.StartsWith("http", StringComparison.OrdinalIgnoreCase)
+            ? website
+            : $"https://{website}";
+}
+
+<section class="hero">
+    <div class="hero__panel">
+        <p class="hero__eyebrow">SELECTED REPOSITORIES</p>
+        <h1>GitHub portfolio for @Model.GitHubUsername</h1>
+        <p class="hero__subtitle">
+            Curated projects only. Selection and content are managed through the hidden web admin panel.
+        </p>
+        <div class="hero__actions">
+            <a class="btn-primary-solid" href="@Model.ProfileUrl" target="_blank" rel="noopener noreferrer">
+                Open GitHub profile
+            </a>
+            <span class="hero__meta">Projects shown: @Model.Projects.Count</span>
+        </div>
+    </div>
+</section>
+
+@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+{
+    <section class="state state--warning">
+        <p>@Model.ErrorMessage</p>
+    </section>
+}
+else
+{
+    if (!string.IsNullOrWhiteSpace(Model.InfoMessage))
+    {
+        <section class="state">
+            <p>@Model.InfoMessage</p>
+        </section>
+    }
+
+    @if (Model.Projects.Any())
+    {
+        <section class="projects-grid">
+            @foreach (var project in Model.Projects)
+            {
+                <article class="project-card glow-card" data-glow>
+                    <div data-glow></div>
+                    <header class="project-card__head">
+                        <h2>
+                            <a href="@project.HtmlUrl" target="_blank" rel="noopener noreferrer">@project.Name</a>
+                        </h2>
+                        <span class="chip">@project.Language</span>
+                    </header>
+
+                    <p class="project-card__description">@project.Description</p>
+
+                    <div class="project-card__stats">
+                        <span>Stars: @project.Stars</span>
+                        <span>Forks: @project.Forks</span>
+                        <span>Updated: @project.UpdatedAt.LocalDateTime.ToString("dd.MM.yyyy")</span>
+                    </div>
+
+                    <div class="project-card__actions">
+                        @{
+                            var projectPageLink = Model.GetProjectPageLink(project.Name);
+                        }
+                        @if (!string.IsNullOrWhiteSpace(projectPageLink))
+                        {
+                            <a class="project-link project-link--case" href="@projectPageLink">Project page</a>
+                        }
+                        <a class="project-link" href="@project.HtmlUrl" target="_blank" rel="noopener noreferrer">Repository</a>
+                        @if (!string.IsNullOrWhiteSpace(project.Homepage))
+                        {
+                            <a class="project-link project-link--alt"
+                               href="@project.Homepage"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                Demo
+                            </a>
+                        }
+                    </div>
+                </article>
+            }
+        </section>
+    }
+}
+
+@if (Model.Settings.ShowAboutSection)
+{
+    <section class="content-section">
+        <h3>@(string.IsNullOrWhiteSpace(Model.Settings.AboutTitle) ? "About me" : Model.Settings.AboutTitle)</h3>
+        <p>@(string.IsNullOrWhiteSpace(Model.Settings.AboutText) ? "Fill this text in hidden admin panel." : Model.Settings.AboutText)</p>
+    </section>
+}
+
+@if (Model.Settings.ShowContactsSection)
+{
+    <section class="content-section">
+        <h3>Contacts</h3>
+        <div class="contacts-grid">
+            @if (!string.IsNullOrWhiteSpace(Model.Settings.ContactsEmail))
+            {
+                <a class="contact-link" href="mailto:@Model.Settings.ContactsEmail">@Model.Settings.ContactsEmail</a>
+            }
+            @if (!string.IsNullOrWhiteSpace(telegramLink))
+            {
+                <a class="contact-link" href="@telegramLink" target="_blank" rel="noopener noreferrer">@Model.Settings.ContactsTelegram</a>
+            }
+            @if (!string.IsNullOrWhiteSpace(websiteLink))
+            {
+                <a class="contact-link" href="@websiteLink" target="_blank" rel="noopener noreferrer">@Model.Settings.ContactsWebsite</a>
+            }
+        </div>
+    </section>
+}

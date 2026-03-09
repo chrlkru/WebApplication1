@@ -1,0 +1,144 @@
+@page "/projects/{slug}"
+@model WebApplication1.Pages.Projects.DetailsModel
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<section class="project-hero">
+    <a class="project-back-link" asp-page="/Index">Back to portfolio</a>
+    <h1>@Model.Title</h1>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Presentation?.Intro))
+    {
+        <p>@Model.Presentation.Intro</p>
+    }
+</section>
+
+@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+{
+    <section class="state state--warning">
+        <p>@Model.ErrorMessage</p>
+    </section>
+}
+else if (Model.Repository is not null)
+{
+    @if (Model.CarouselItems.Count > 0)
+    {
+        <section class="showcase-carousel-wrap" data-showcase-carousel>
+            <div class="showcase-carousel">
+                <ul class="showcase-carousel-track" data-showcase-track>
+                @for (var i = 0; i < Model.CarouselItems.Count; i++)
+                {
+                    var item = Model.CarouselItems[i];
+                    <li class="showcase-slide @(i == 0 ? "is-active" : string.Empty)"
+                        data-showcase-slide
+                        data-slide-index="@i">
+                        <div class="showcase-slide-bg">
+                            @if (item.MediaType == "video")
+                            {
+                                <video src="@item.Url" controls preload="metadata"></video>
+                            }
+                            else
+                            {
+                                <img src="@item.Url" alt="@Model.Title media @(i + 1)" loading="eager" decoding="async" />
+                            }
+                            <div class="showcase-slide-overlay"></div>
+                        </div>
+
+                        <article class="showcase-slide-content">
+                            <h2>@Model.Title</h2>
+                            @if (!string.IsNullOrWhiteSpace(item.Caption))
+                            {
+                                <p>@item.Caption</p>
+                            }
+                            <a class="showcase-slide-button"
+                               href="@Model.Repository.HtmlUrl"
+                               target="_blank"
+                               rel="noopener noreferrer">
+                                Open repository
+                            </a>
+                        </article>
+                    </li>
+                }
+                </ul>
+            </div>
+            @if (Model.CarouselItems.Count > 1)
+            {
+                <div class="showcase-controls">
+                    <button type="button"
+                            class="showcase-control showcase-prev"
+                            data-showcase-prev
+                            aria-label="Previous slide">
+                        <span>></span>
+                    </button>
+                    <button type="button"
+                            class="showcase-control"
+                            data-showcase-next
+                            aria-label="Next slide">
+                        <span>></span>
+                    </button>
+                </div>
+            }
+        </section>
+    }
+
+    <section class="project-meta-panel">
+        <div class="project-meta-actions">
+            <a class="project-link" href="@Model.Repository.HtmlUrl" target="_blank" rel="noopener noreferrer">Repository</a>
+            @if (!string.IsNullOrWhiteSpace(Model.Repository.Homepage))
+            {
+                <a class="project-link project-link--alt" href="@Model.Repository.Homepage" target="_blank" rel="noopener noreferrer">Demo</a>
+            }
+        </div>
+        <p class="project-meta-line">Language: @Model.Repository.Language</p>
+        <p class="project-meta-line">Stars: @Model.Repository.Stars</p>
+        <p class="project-meta-line">Forks: @Model.Repository.Forks</p>
+        <p class="project-meta-line">Updated: @Model.Repository.UpdatedAt.LocalDateTime.ToString("dd.MM.yyyy")</p>
+    </section>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Presentation?.HeroImageUrl))
+    {
+        <section class="project-image-wrap">
+            <img src="@Model.Presentation.HeroImageUrl" alt="@Model.Title" />
+        </section>
+    }
+
+    <section class="project-content-grid">
+        @if (!string.IsNullOrWhiteSpace(Model.Presentation?.Problem))
+        {
+            <article class="content-section">
+                <h3>Problem</h3>
+                <p>@Model.Presentation.Problem</p>
+            </article>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Presentation?.Solution))
+        {
+            <article class="content-section">
+                <h3>Solution</h3>
+                <p>@Model.Presentation.Solution</p>
+            </article>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Presentation?.Result))
+        {
+            <article class="content-section">
+                <h3>Result</h3>
+                <p>@Model.Presentation.Result</p>
+            </article>
+        }
+    </section>
+
+    @if (Model.TechStackItems.Count > 0)
+    {
+        <section class="content-section">
+            <h3>Tech stack</h3>
+            <div class="tech-chips">
+                @foreach (var item in Model.TechStackItems)
+                {
+                    <span class="chip">@item</span>
+                }
+            </div>
+        </section>
+    }
+}

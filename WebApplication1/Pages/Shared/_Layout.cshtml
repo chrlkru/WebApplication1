@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - GitHub Portfolio</title>
+    <script type="importmap"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/WebApplication1.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="animated-bg" aria-hidden="true">
+        <div class="gradients-container">
+            <div class="bg-orb bg-orb--first"></div>
+            <div class="bg-orb bg-orb--second"></div>
+            <div class="bg-orb bg-orb--third"></div>
+            <div class="bg-orb bg-orb--fourth"></div>
+            <div class="bg-orb bg-orb--fifth"></div>
+            <div class="bg-pointer" id="bgPointer"></div>
+        </div>
+    </div>
+
+    <header class="site-header">
+        <div class="page-shell">
+            <a class="site-logo" asp-area="" asp-page="/Index">GH / PORTFOLIO</a>
+        </div>
+    </header>
+
+    <main class="page-shell page-main">
+        @RenderBody()
+    </main>
+
+    <footer class="site-footer">
+        <div class="page-shell">
+            &copy; @DateTime.UtcNow.Year GitHub Portfolio
+        </div>
+    </footer>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,23 @@
+# Build artifacts
+**/bin/
+**/obj/
+
+# IDE
+.vs/
+*.user
+*.suo
+
+# Local runtime data and secrets
+WebApplication1/Data/portfolio-settings.json
+WebApplication1/wwwroot/uploads/
+
+# Logs
+*.log
+
+# Env secrets
+.env
+.env.*
+!.env.example
+
+# Future frontend deps
+node_modules/

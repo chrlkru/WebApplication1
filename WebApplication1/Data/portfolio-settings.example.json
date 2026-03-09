@@ -1,0 +1,14 @@
+﻿{
+  "GitHubUsername": "your-github-username",
+  "GitHubToken": "",
+  "SelectedRepositories": [],
+  "ProjectPages": [],
+  "ShowAboutSection": true,
+  "AboutTitle": "About me",
+  "AboutText": "Add your summary in the hidden admin panel.",
+  "ShowContactsSection": true,
+  "ContactsEmail": "",
+  "ContactsTelegram": "",
+  "ContactsWebsite": "",
+  "AdminAccessCode": "change-me"
+}
