@@ -1,70 +1,90 @@
 # GitHub Portfolio (ASP.NET Core Razor Pages)
 
-Portfolio website for GitHub projects with:
-- selected repositories only,
-- hidden web admin panel,
-- per-project presentation pages,
-- media upload (images/videos) and carousel.
+Сайт-портфолио GitHub-проектов с возможностями:
+- отображение только выбранных репозиториев;
+- скрытая веб-админка;
+- отдельные презентационные страницы проектов;
+- загрузка медиа (изображения/видео) и карусель.
 
-## Tech Stack
+## Технологии
 - ASP.NET Core 9 (Razor Pages)
 - C#
-- JSON-based local settings storage
+- локальное хранение настроек в JSON
+- xUnit + Playwright (UI e2e-тесты)
 
-## Project Structure
-- `WebApplication1/Program.cs` - app startup and `.env` loading
-- `WebApplication1/Pages/` - UI pages (home, admin, project details)
-- `WebApplication1/Services/` - GitHub API and settings store
-- `WebApplication1/Models/` - app models
-- `WebApplication1/wwwroot/` - static files (css/js/uploads)
-- `WebApplication1/Data/` - local runtime settings (ignored in git)
+## Структура проекта
+- `WebApplication1/Program.cs` - запуск приложения и загрузка `.env`
+- `WebApplication1/Pages/` - UI-страницы (главная, админка, детали проекта)
+- `WebApplication1/Services/` - GitHub API и хранилище настроек
+- `WebApplication1/Models/` - модели приложения
+- `WebApplication1/wwwroot/` - статические файлы (css/js/uploads)
+- `WebApplication1/Data/` - локальные runtime-настройки (игнорируются в git)
+- `WebApplication1.Tests/` - unit-тесты и Playwright e2e-тесты
 
-## Quick Start
-1. Install .NET SDK 9
-2. Create local env file from template:
-   - copy `.env.example` -> `.env`
-3. Configure secrets in `.env`:
+## Быстрый старт
+1. Установите .NET SDK 9.
+2. Создайте локальный env-файл из шаблона:
+   - скопируйте `.env.example` -> `.env`
+3. Заполните секреты в `.env`:
 
 ```env
 PORTFOLIO_GITHUB_TOKEN=
 PORTFOLIO_ADMIN_ACCESS_CODE=change-me
 ```
 
-4. Run:
+4. Запустите приложение из корня решения:
 
 ```bash
-cd WebApplication1
-dotnet run --urls http://localhost:5078
+dotnet run --project WebApplication1/WebApplication1.csproj --urls http://localhost:5078
 ```
 
-5. Open:
-- Home: `http://localhost:5078`
-- Admin: `http://localhost:5078/__portfolio-admin-7f1d2`
+5. Откройте:
+- Главная: `http://localhost:5078`
+- Админка: `http://localhost:5078/__portfolio-admin-7f1d2`
 
-## Admin Panel Features
-- Set GitHub username/token
-- Choose visible repositories
-- Edit About/Contacts sections
-- Configure project subpages
-- Upload media for each project
-- Set media order, captions, and remove media
+## Конфигурация
+- `PORTFOLIO_GITHUB_TOKEN` - опциональный токен для снижения проблем с rate limit GitHub API.
+- `PORTFOLIO_ADMIN_ACCESS_CODE` - код доступа в админку (используйте сложное значение).
+- `GitHub__ApiBaseUrl` - опциональный override базового URL GitHub API.
+  - по умолчанию: `https://api.github.com/`
+  - удобно для локальных интеграционных/e2e-тестов с фейковым API-сервером.
 
-## GitHub API Rate Limit
-If you see rate-limit warnings, add `PORTFOLIO_GITHUB_TOKEN` in `.env` or in admin panel token field.
+## Возможности админки
+- настройка GitHub username/token;
+- выбор отображаемых репозиториев;
+- редактирование блоков About/Contacts;
+- настройка подстраниц проектов;
+- загрузка медиа для каждого проекта;
+- управление порядком, подписями и удалением медиа.
 
-## Security Notes
-- `.env` is ignored by git
-- `WebApplication1/Data/portfolio-settings.json` is ignored by git
-- uploads folder is ignored by git
-- use strong `PORTFOLIO_ADMIN_ACCESS_CODE`
+## Rate Limit GitHub API
+Если появляется предупреждение о rate limit, добавьте `PORTFOLIO_GITHUB_TOKEN` в `.env` или в поле токена в админке.
 
-## Build
+## Безопасность
+- `.env` игнорируется в git;
+- `WebApplication1/Data/portfolio-settings.json` игнорируется в git;
+- папка `uploads` игнорируется в git;
+- используйте сложный `PORTFOLIO_ADMIN_ACCESS_CODE`.
+
+## Сборка
 ```bash
-cd WebApplication1
-dotnet build
+dotnet build WebApplication1.sln
 ```
 
-## Publish to GitHub
+## Тесты
+Запуск всех тестов (unit + Playwright e2e):
+
+```bash
+dotnet test WebApplication1.sln -v minimal
+```
+
+Установка Playwright Chromium (один раз, Windows PowerShell):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\WebApplication1.Tests\bin\Debug\net9.0\playwright.ps1 install chromium
+```
+
+## Публикация на GitHub
 ```bash
 git remote add origin https://github.com/<USERNAME>/<REPO>.git
 git branch -M main

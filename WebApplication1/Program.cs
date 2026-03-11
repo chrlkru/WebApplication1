@@ -5,12 +5,13 @@ LoadDotEnv(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
 LoadDotEnv(Path.Combine(Directory.GetCurrentDirectory(), "..", ".env"));
 
 var builder = WebApplication.CreateBuilder(args);
+var gitHubApiBaseUrl = builder.Configuration["GitHub:ApiBaseUrl"] ?? "https://api.github.com/";
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddHttpClient("GitHub", client =>
 {
-    client.BaseAddress = new Uri("https://api.github.com/");
+    client.BaseAddress = new Uri(gitHubApiBaseUrl);
     client.DefaultRequestHeaders.UserAgent.ParseAdd("WebApplication1-GitHubPortfolio");
     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
     client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
